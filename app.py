@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from http import HTTPStatus
+import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -15,7 +16,7 @@ class Todo(db.Model):
     number = db.Column(db.String(11), nullable=False)
 
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
     new_user = Todo(username=data['username'], password=data['password'], email=data['email'], number=data['number'])
@@ -29,15 +30,34 @@ def signup():
         return {'message': 'Error: bad request'}, HTTPStatus.BAD_REQUEST
 
 
-@app.route('/show_user', methods=['GET'])
+@app.route('/show_user/<username>', methods=['GET'])
 def show_user(username):
-    if request.method == 'GET':
-        user = Todo.query.filter_by(username=username)
+	data = request.json
+	if data['token'] != token['username']:
+		return {'message': 'Error'}, HTTPStatus.Unauthorized
 
+    if request.method == 'GET':
         try:
+       		user = Todo.query.filter_by(username=username) 	
             return {'message': 'Success', 'user': user}, HTTPStatus.OK
         except:
             return {'message': 'Error'}, HTTPStatus.NOT_FOUND
+
+
+@app.route('/signin', methods=['POST'])
+def signin():
+	data = request.json
+
+	now = datetime.date.today()
+	difference1 = datetime.timedelta(days=1)
+	try:
+		user = Todo.query.filter_by(username=data['username'], password=data['password'])
+		token[username] = (''.join(random.choice(string.ascii_lowercase)), now+difference1)
+		return {'message': "success", 'token':token[username][0]}, HTTPStatus.OK
+	except:
+		return {'message': 'Bad fields'}, HTTPStatus.BAD_REQUEST
+
+
 
 
 if __name__ == "__main__":
