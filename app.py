@@ -33,10 +33,10 @@ def signup():
         return {'message': 'Error: bad request'}, HTTPStatus.BAD_REQUEST
 
 
-@app.route('/update_user/<int:id>', methods=['POST'])
+@app.route('/update_user/<int:id>', methods=['POST', 'GET'])
 def update_user(id):
     data = request.json
-    if data['token'] != token['username']:
+    if data['token'] != tokens['username']:
         return {'message': 'Error'}, HTTPStatus.Unauthorized
     if request.method == 'POST':
         user = Todo.query.get_or_404(id)
@@ -54,7 +54,7 @@ def update_user(id):
 @app.route('/show_user/<int:id>', methods=['GET'])
 def show_user(id):
     data = request.json
-    if data['token'] != token['username']:
+    if data['token'] != tokens['username']:
         return {'message': 'Error'}, HTTPStatus.Unauthorized
 
     if request.method == 'GET':
@@ -73,8 +73,8 @@ def signin():
     difference1 = datetime.timedelta(days=1)
     try:
         user = Todo.query.filter_by(username=data['username'], password=data['password'])
-        token[username] = (''.join(random.choice(string.ascii_lowercase)), now + difference1)
-        return {'message': "success", 'token': token[username][0]}, HTTPStatus.OK
+        tokens[username] = (''.join(random.choice(string.ascii_lowercase)), now + difference1)
+        return {'message': "success", 'token': tokens[username][0]}, HTTPStatus.OK
     except:
         return {'message': 'Bad fields'}, HTTPStatus.BAD_REQUEST
 
