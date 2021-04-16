@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, insert 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -7,8 +7,11 @@ db = SQLAlchemy(app)
 
 
 class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
+    username = db.Column(db.String(200), primary_key=True)
+    password = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    number = db.Coumn(db.String(11), nullable=False)
+
 
 
 @app.route('/')
