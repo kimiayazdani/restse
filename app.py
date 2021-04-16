@@ -73,8 +73,8 @@ def signin():
     difference1 = datetime.timedelta(days=1)
     try:
         user = Todo.query.filter_by(username=data['username'], password=data['password'])
-        tokens[username] = (''.join(random.choice(string.ascii_lowercase)), now + difference1)
-        return {'message': "success", 'token': tokens[username][0]}, HTTPStatus.OK
+        tokens['username'] = (''.join(random.choice(string.ascii_lowercase)), now + difference1)
+        return {'message': "success", 'token': tokens['username'][0]}, HTTPStatus.OK
     except:
         return {'message': 'Bad fields'}, HTTPStatus.BAD_REQUEST
 
