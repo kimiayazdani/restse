@@ -24,9 +24,9 @@ def signup():
 		db.session.add(new_user)
 		db.session.commit()
 		return {'message': 'Success'}, HTTPStatus.CREATED	
-		
+
 	except:
-		return {'message': 'Error: missing or bad fields'}, HTTPStatus.BAD_REQUEST
+		return {'message': 'Error: bad request'}, HTTPStatus.BAD_REQUEST
     
 
 
