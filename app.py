@@ -1,4 +1,7 @@
-from flask import Flask, request
+import string
+from random import random
+
+from flask import Flask, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from http import HTTPStatus
 import datetime
@@ -30,15 +33,33 @@ def signup():
         return {'message': 'Error: bad request'}, HTTPStatus.BAD_REQUEST
 
 
-@app.route('/show_user/<username>', methods=['GET'])
-def show_user(username):
-	data = request.json
-	if data['token'] != token['username']:
-		return {'message': 'Error'}, HTTPStatus.Unauthorized
+@app.route('/update_user/<int:id>', methods=['POST'])
+def update_user(id):
+    data = request.json
+    if data['token'] != token['username']:
+        return {'message': 'Error'}, HTTPStatus.Unauthorized
+    if request.method == 'POST':
+        user = Todo.query.get_or_404(id)
+        user.password = request.form['password']
+        user.email = request.form['email']
+        user.number = request.form['number']
+        try:
+            db.session.commit()
+            return redirect('/')
+        except:
+            return {'message': 'Cannot change user data'}, HTTPStatus.BAD_REQUEST
+
+
+
+@app.route('/show_user/<int:id>', methods=['GET'])
+def show_user(id):
+    data = request.json
+    if data['token'] != token['username']:
+        return {'message': 'Error'}, HTTPStatus.Unauthorized
 
     if request.method == 'GET':
         try:
-       		user = Todo.query.filter_by(username=username) 	
+            user = Todo.query.filter_by(id=id)
             return {'message': 'Success', 'user': user}, HTTPStatus.OK
         except:
             return {'message': 'Error'}, HTTPStatus.NOT_FOUND
@@ -46,18 +67,16 @@ def show_user(username):
 
 @app.route('/signin', methods=['POST'])
 def signin():
-	data = request.json
+    data = request.json
 
-	now = datetime.date.today()
-	difference1 = datetime.timedelta(days=1)
-	try:
-		user = Todo.query.filter_by(username=data['username'], password=data['password'])
-		token[username] = (''.join(random.choice(string.ascii_lowercase)), now+difference1)
-		return {'message': "success", 'token':token[username][0]}, HTTPStatus.OK
-	except:
-		return {'message': 'Bad fields'}, HTTPStatus.BAD_REQUEST
-
-
+    now = datetime.date.today()
+    difference1 = datetime.timedelta(days=1)
+    try:
+        user = Todo.query.filter_by(username=data['username'], password=data['password'])
+        token[username] = (''.join(random.choice(string.ascii_lowercase)), now + difference1)
+        return {'message': "success", 'token': token[username][0]}, HTTPStatus.OK
+    except:
+        return {'message': 'Bad fields'}, HTTPStatus.BAD_REQUEST
 
 
 if __name__ == "__main__":
